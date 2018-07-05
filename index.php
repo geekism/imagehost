@@ -83,19 +83,19 @@ if(isset($_POST['submit'])) {
 ?>
 	<head>
 			<style type="text/css">
-				body { background: #222222; color: #fefefe; font-family: Tahoma, 'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
-				a { color: #ffa200; text-decoration: none; }
-				a:hover { text-decoration: underline bold; color: #242424; }
-				table { margin: auto; width: 75%; border-collapse:separate; border:solid white 1px; border-radius:9px; -moz-border-radius:9px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
-				td.main { color: #fff; background: #242424; font-size: 0.900em; padding-top: 3px; padding-bottom: 3px; width: 99%; }
-				td.main a { color:#ffa200; font-size: 0.900em; width: 99%; }
-				img { width: 600px; height: 400px; border: 2px solid #242424; }
-				td.main a:hover { background: #242424; color: #fff; }
-				td { background: #242424; color: #fff; }
-				tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line;  }
-				ainput[type=button], ainput[type=submit], ainput[type=reset] { background-color: #555; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 10%; -webkit-transition-duration: 0.4s; transition-duration: 0.4s; }
-				input[type=button], input[type=submit], input[type=reset] .abutton:hover { background-color: #555; color: white; box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); }
-				footer { color: #fff; font-size: 10px; }
+			      body { background: #222222; color: #fefefe; font-family: Tahoma, 'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
+			      a { color: #ffa200; text-decoration: none; }
+			      a:hover { text-decoration: underline bold; color: #242424; }
+			      table { margin: auto; width: 75%; border-collapse:separate; border:solid white 1px; border-radius:9px; -moz-border-radius:9px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
+			      td.main { color: #fff; background: #242424; font-size: 0.900em; padding-top: 3px; padding-bottom: 3px; width: 99%; }
+			      td.main a { color:#ffa200; font-size: 0.900em; width: 99%; }
+			      img { width: 600px; height: 400px; border: 2px solid #242424; }
+			      td.main a:hover { background: #242424; color: #fff; }
+			      td { background: #242424; color: #fff; }
+			      tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line;  }
+			      ainput[type=button], ainput[type=submit], ainput[type=reset] { background-color: #555; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 10%; -webkit-transition-duration: 0.4s; transition-duration: 0.4s; }
+			      input[type=button], input[type=submit], input[type=reset] .abutton:hover { background-color: #555; color: white; box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); }
+			      footer { color: #fff; font-size: 10px; }
 			</style>
 		<title>Image Hosting: Powered by justla.me</title>
 	</head>
@@ -115,7 +115,6 @@ if(isset($_POST['submit'])) {
 				<input type="submit" name="submit" value="submit"/>
 				</form>
 				<BR><BR>
-				<footer>Free Image Hosting: Powered by <a href="https://github.com/geekism/imagehost" target="_blank">justla.me</a></footer>
 				<?php
 					if ($message) {
 							echo $message;
@@ -124,10 +123,10 @@ if(isset($_POST['submit'])) {
 					}
 				?>
 				<BR><BR>
+                                <footer>Free Image Hosting: Powered by <a href="https://github.com/geekism/imagehost" target="_blank">justla.me</a><br><br></footer>
 			</center>
 			</th>
 		</table>
 	</body>
 </html>
-
 
