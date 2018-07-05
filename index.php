@@ -1,5 +1,8 @@
 <?php
-if (!file_exists("uploads")) { 
+
+$imagehost = "v1.5.8";
+
+if (!file_exists("uploads")) {
 mkdir("uploads", 0755); chmod("uploads", 0755);
 	echo '
 		<head>
@@ -123,10 +126,9 @@ if(isset($_POST['submit'])) {
 					}
 				?>
 				<BR><BR>
-                                <footer>Free Image Hosting: Powered by <a href="https://github.com/geekism/imagehost" target="_blank">justla.me</a><br><br></footer>
+                                <footer>ImageHosting<?php echo $imagehost; ?>.php: Powered by <a href="https://github.com/geekism/imagehost" target="_blank">justla.me</a><br><br></footer>
 			</center>
 			</th>
 		</table>
 	</body>
 </html>
-
