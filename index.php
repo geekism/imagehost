@@ -127,7 +127,7 @@ Edit below: CSS Style is below!
 			      body { background: #222222; color: #fefefe; font-family: Tahoma, 'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
 			      a { color: #ffa200; text-decoration: none; }
 			      a:hover { text-decoration: underline bold; color: #242424; }
-			      table { margin: auto; width: 75%; border-collapse:separate; border:solid white 1px; border-radius:9px; -moz-border-radius:9px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
+			      table { margin: auto; width: 75%; border-collapse:separate; border:solid white 1px; border-radius:2px; -moz-border-radius:2px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
 			      td.main { color: #fff; background: #242424; font-size: 0.900em; padding-top: 3px; padding-bottom: 3px; width: 99%; }
 			      td.main a { color:#ffa200; font-size: 0.900em; width: 99%; }
 			      img { width: 600px; height: 400px; border: 2px solid #242424; }
