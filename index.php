@@ -102,7 +102,7 @@ if(isset($_REQUEST["download"])){
 
 $fi = new FilesystemIterator(__DIR__ . "/uploads/", FilesystemIterator::SKIP_DOTS);
 
-if($_GET['view']) { $show = "1"; }
+if(isset($_GET['view']) == "yes") { $show = "1"; } else { $show = "0"; }
 
 function getFileExt($filename) {
    return substr(strrchr($filename,'.'),1);
@@ -162,10 +162,11 @@ Edit below: CSS Style is below!
 	<body>
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<th>
-			<a href="/">home</a> - <?php if ($show) {
-										echo "hide images";
+			<a href="/">home</a> - <?php
+									if ($show) {
+										echo '<a href="/">hide images</a>';
 									}else{
-										echo '<a href="?view=images">images</a>';
+										echo '<a href="?view=yes">show images</a>';
 									}
 									?>
 		    </th>
