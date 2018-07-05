@@ -185,7 +185,7 @@ Edit below: CSS Style is below!
 	<body>
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<th>
-			<a href="/">home</a> - <a href="/?images">images</a>
+			<a href="/">home</a> - <a href="/&images=list">images</a>
 		    </th>
 		</table>
 
