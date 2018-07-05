@@ -4,6 +4,23 @@
 	Do not edit anything from here to the STOP. Required for the missing features!
 */
 
+function getFilesize($file,$digits = 2) {
+       if (is_file($file)) {
+               $filePath = $file;
+               if (!realpath($filePath)) {
+                       $filePath = $_SERVER["DOCUMENT_ROOT"].$filePath;
+       }
+           $fileSize = filesize($filePath);
+               $sizes = array("TB","GB","MB","KB","B");
+               $total = count($sizes);
+               while ($total-- && $fileSize > 1024) {
+                       $fileSize /= 1024;
+                       }
+               return round($fileSize, $digits)." ".$sizes[$total];
+       }
+       return false;
+}
+
 function checkMissing() {
 	if (!file_exists("uploads")) {
 	mkdir("uploads", 0755); chmod("uploads", 0755);
@@ -192,14 +209,15 @@ Edit below: CSS Style is below!
                 			}
         			}
 				sort($files);
-				//foreach ($files as $file) { }
 				echo '
                         	<table border="0" cellpadding="0" cellspacing="0" width="100%">
 	                                <th>listing current images</th>
         		                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
                         			        <center><th>
 				';
-								foreach ($files as $file) { echo '<a href="/img/'.$file.'">'.$file.'</a><br>'; }
+								foreach ($files as $file) {
+									$mod_date=date("F d Y", filemtime($dir.'/'.$file));
+									echo '<b>'.$mod_date,'</b>: <a href="/img/'.$file.'">'.$file.'</a> - size: '.getFilesize($dir.'/'.$file).'<br>'; }
 				echo '
 							</th></center>
                 		                </table>
