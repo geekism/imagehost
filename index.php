@@ -162,7 +162,12 @@ Edit below: CSS Style is below!
 	<body>
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<th>
-			<a href="/">home</a> - <a href="?view=images">images</a>
+			<a href="/">home</a> - <?php if ($show) {
+										echo "hide images";
+									}else{
+										echo '<a href="?view=images">images</a>';
+									}
+									?>
 		    </th>
 		</table>
 
