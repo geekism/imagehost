@@ -1,68 +1,105 @@
 <?php
 
-$imagehost = "v1.5.8";
+/* 
+	Do not edit anything from here to the STOP. Required for the missing features!
+*/
 
-if (!file_exists("uploads")) {
-mkdir("uploads", 0755); chmod("uploads", 0755);
-	echo '
-		<head>
-			<style type="text/css">
-			body { background: #000; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; }
-			</style>
-		<title>Missing: uploads folder</title>
-		</head>
-		<html>
-			<body>
-				<center><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
-					<h2>
-						Directory: <b>uploads</b> wasnt found.
-					</h2><br>
-						Creating it: mkdir uploads/<br>
-						Setting permissions: chmod 755 uploads/<br>
-						Click to <a href="">Continue</a></center>
-			</body>
-		</html>
-		';
-	return 0;
+function checkMissing() {
+	if (!file_exists("uploads")) {
+	mkdir("uploads", 0755); chmod("uploads", 0755);
+		echo '
+			<head>
+				<style type="text/css">
+				body { background: #000; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; }
+				</style>
+			<title>Missing: uploads folder</title>
+			</head>
+			<html>
+				<body>
+					<center><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
+						<h2>
+							Directory: <b>uploads</b> wasnt found.
+						</h2><br>
+							Creating it: mkdir uploads/<br>
+							Setting permissions: chmod 755 uploads/<br>
+							Click to <a href="">Continue</a></center>
+				</body>
+			</html>
+			';
+		return 0;
+	}
+	if (!file_exists(".htaccess")) {
+	$file = '.htaccess';
+	$contents = '
+	<IfModule mod_rewrite.c>
+		RewriteEngine on
+		RewriteCond %{HTTPS} !=on
+		RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+		RewriteRule "^img/(.*)$" "/uploads/$1"
+	</IfModule>
+	Options -Indexes -MultiViews
+	';
+	file_put_contents($file, $contents);
+	    echo '
+			<head>
+				<style type="text/css">
+				body { background: #000; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; }
+				</style>
+			<title>Missing: .htaccess</title>
+			</head>
+			<html>
+				<body>
+					<center><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
+						<h2>
+							File: <b>.htaccess</b> wasnt found.
+						</h2><br>
+							Creating it: touch .htaccess<br>
+							Writing .htaccess settings ... Done<br>
+							Click to <a href="">Continue</a></center>
+				</body>
+			</html>
+			';
+		return 0;
+	}
 }
 
-if (!file_exists(".htaccess")) {
-$file = '.htaccess';
-$contents = '
-<IfModule mod_rewrite.c>
-	RewriteEngine on
-	RewriteCond %{HTTPS} !=on
-	RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
-	RewriteRule "^img/(.*)$" "/uploads/$1"
-</IfModule>
-Options -Indexes -MultiViews
-';
+$imagehost = "v1.5.8";
 
-file_put_contents($file, $contents);
-    echo '
-		<head>
-			<style type="text/css">
-			body { background: #000; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; }
-			</style>
-		<title>Missing: .htaccess</title>
-		</head>
-		<html>
-			<body>
-				<center><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
-					<h2>
-						File: <b>.htaccess</b> wasnt found.
-					</h2><br>
-						Creating it: touch .htaccess<br>
-						Writing .htaccess settings ... Done<br>
-						Click to <a href="">Continue</a></center>
-			</body>
-		</html>
-		';
-	return 0;
 
+if(isset($_REQUEST["download"])){
+    $file = urldecode($_REQUEST["download"]);
+    $filepath = getcwd() . "/" . $file;
+    if(file_exists($filepath)) {
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename="'.basename($filepath).'"');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($filepath));
+        flush();
+        readfile($filepath);
+        exit;
+    }
+}
+
+$images = $_GET['images'];
+if (strpos($source, 'source') !== false) {
+foreach($images as $img) {
+    echo "<div class=\"photo\">";
+    echo "<img src=\"{$img['file']}\" {$img['size'][3]} alt=\"\"><br>\n";
+    echo "<a href=\"{$img['file']}\">",basename($img['file']),"</a><br>\n";
+    echo "({$img['size'][0]} x {$img['size'][1]} pixels)<br>\n";
+    echo $img['size']['mime'];
+    echo "</div>\n";
+  }
 }
 
 $fi = new FilesystemIterator(__DIR__ . "/uploads/", FilesystemIterator::SKIP_DOTS);
+
+function getFileExt($filename) {
+   return substr(strrchr($filename,'.'),1);
+}
 
 function is_image($path) {
     $a = getimagesize($path);
@@ -71,6 +108,30 @@ function is_image($path) {
     return false;
 }
 
+function getImages($dir) {
+    $retval = [];
+    if(substr($dir, -1) != "/") {
+      $dir .= "/";
+    }
+    $fulldir = "{$_SERVER['DOCUMENT_ROOT']}/$dir";
+    $d = @dir($fulldir) or die("getImages: Failed opening directory {$dir} for reading");
+    while(FALSE !== ($entry = $d->read())) {
+      if($entry{0} == ".") continue;
+      $f = escapeshellarg("{$fulldir}{$entry}");
+      $mimetype = trim(shell_exec("file -bi {$f}"));
+      foreach($GLOBALS['imagetypes'] as $valid_type) {
+        if(preg_match("@^{$valid_type}@", $mimetype)) {
+          $retval[] = [
+           'file' => "/{$dir}{$entry}",
+           'size' => getimagesize("{$fulldir}{$entry}")
+          ];
+          break;
+        }
+      }
+    }
+    $d->close();
+    return $retval;
+}
 
 if(isset($_POST['submit'])) {
     $temp_name = $_FILES["file"]["tmp_name"];
@@ -83,7 +144,24 @@ if(isset($_POST['submit'])) {
         $message = "". $newname . "." . $ext . " was uploaded!<br><br>";
     }
 }
+
+checkMissing();
+
+$imgdir = getcwd() . "/uploads/";
+$images = getImages($imgdir);
+
+$imagetypes = ['image/jpeg', 'image/bmp', 'image/png', 'image/gif', 'image/jpg'];
+
 ?>
+
+
+
+
+
+<!--
+Edit below: CSS Style is below!
+-->
+
 	<head>
 			<style type="text/css">
 			      body { background: #222222; color: #fefefe; font-family: Tahoma, 'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
@@ -95,6 +173,7 @@ if(isset($_POST['submit'])) {
 			      img { width: 600px; height: 400px; border: 2px solid #242424; }
 			      td.main a:hover { background: #242424; color: #fff; }
 			      td { background: #242424; color: #fff; }
+			      .photo { float: left; margin: 0.5em; border: 1px solid #ccc; padding: 1em; box-shadow: 2px 2px 3px rgba(0,0,0,0.2); text-align: center; font-size: 0.8em; }
 			      tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line;  }
 			      ainput[type=button], ainput[type=submit], ainput[type=reset] { background-color: #555; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 10%; -webkit-transition-duration: 0.4s; transition-duration: 0.4s; }
 			      input[type=button], input[type=submit], input[type=reset] .abutton:hover { background-color: #555; color: white; box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); }
@@ -105,8 +184,12 @@ if(isset($_POST['submit'])) {
 <html>
 	<body>
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
-			home - images
+			<th>
+			<a href="/">home</a> - <a href="/?images">images</a>
+		    </th>
 		</table>
+
+
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<center>
 			<th>
@@ -119,7 +202,7 @@ if(isset($_POST['submit'])) {
 				<br><label for="female">Accepted Formats: jpg, jpeg. bmp, png, gif</label><br>
 				<br><br>
 				<input type="submit" name="submit" value="submit"/>
-				</form>
+				</form> 
 				<BR><BR>
 				<?php
 					if ($message) {
