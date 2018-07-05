@@ -21,3 +21,6 @@ One liner:
 
 
 cd /var/www/html && wget https://raw.githubusercontent.com/geekism/imagehost/master/index.php -O index.php && chmod 644 index.php
+
+
+View [screenshot](screenshot.png) of imagehost or test it out at [demo](https://i.justla.me).
