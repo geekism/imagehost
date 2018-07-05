@@ -83,9 +83,14 @@ if(isset($_REQUEST["download"])){
     }
 }
 
-if(isset($_GET['images'])) { $listimages = true; }
 
-if ($listimages !== false) {
+$viewimages = $_GET['view'];
+
+if (isset($viewimages)) {
+	$listimages == true;
+}
+
+if ($listimages == true) {
 foreach($images as $img) {
     echo "<div class=\"photo\">";
     echo "<img src=\"{$img['file']}\" {$img['size'][3]} alt=\"\"><br>\n";
@@ -185,7 +190,7 @@ Edit below: CSS Style is below!
 	<body>
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<th>
-			<a href="/">home</a> - <a href="/&images=list">images</a>
+			<a href="/">home</a> - <a href="?view=images">images</a>
 		    </th>
 		</table>
 
@@ -203,7 +208,7 @@ Edit below: CSS Style is below!
 				<br><br>
 				<input type="submit" name="submit" value="submit"/>
 				</form> 
-				<BR><BR>
+				<BR><BR>	
 				<?php
 					if ($message) {
 							echo $message;
