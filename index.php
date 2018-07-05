@@ -111,11 +111,10 @@ function is_image($path) {
 
 function getImages($dir) {
     $retval = [];
-    if(substr($dir, -1) != "/") {
-      $dir .= "/";
-    }
-    $fulldir = "{$_SERVER['DOCUMENT_ROOT']}/$dir";
-    $d = @dir($fulldir) or die("getImages: Failed opening directory {$dir} for reading");
+    if(substr($dir, -1) != "/") { $dir .= "/"; }
+    $dir = getcwd() . "/uploads/";
+    $fulldir = "$dir";
+    $d = dir($fulldir) or die("getImages: Failed opening directory {$dir} for reading");
     while(FALSE !== ($entry = $d->read())) {
       if($entry{0} == ".") continue;
       $f = escapeshellarg("{$fulldir}{$entry}");
