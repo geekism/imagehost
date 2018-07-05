@@ -83,25 +83,9 @@ if(isset($_REQUEST["download"])){
     }
 }
 
-
-$viewimages = $_GET['view'];
-
-if (isset($viewimages)) {
-	$listimages == true;
-}
-
-if ($listimages == true) {
-foreach($images as $img) {
-    echo "<div class=\"photo\">";
-    echo "<img src=\"{$img['file']}\" {$img['size'][3]} alt=\"\"><br>\n";
-    echo "<a href=\"{$img['file']}\">",basename($img['file']),"</a><br>\n";
-    echo "({$img['size'][0]} x {$img['size'][1]} pixels)<br>\n";
-    echo $img['size']['mime'];
-    echo "</div>\n";
-  }
-}
-
 $fi = new FilesystemIterator(__DIR__ . "/uploads/", FilesystemIterator::SKIP_DOTS);
+
+if($_GET['view']) { $show = "1"; }
 
 function getFileExt($filename) {
    return substr(strrchr($filename,'.'),1);
@@ -112,30 +96,6 @@ function is_image($path) {
     $image_type = $a[2];
     if(in_array($image_type , array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_BMP))) { return true; }
     return false;
-}
-
-function getImages($dir) {
-    $retval = [];
-    if(substr($dir, -1) != "/") { $dir .= "/"; }
-    $dir = getcwd() . "/uploads/";
-    $fulldir = "$dir";
-    $d = dir($fulldir) or die("getImages: Failed opening directory {$dir} for reading");
-    while(FALSE !== ($entry = $d->read())) {
-      if($entry{0} == ".") continue;
-      $f = escapeshellarg("{$fulldir}{$entry}");
-      $mimetype = trim(shell_exec("file -bi {$f}"));
-      foreach($GLOBALS['imagetypes'] as $valid_type) {
-        if(preg_match("@^{$valid_type}@", $mimetype)) {
-          $retval[] = [
-           'file' => "/{$dir}{$entry}",
-           'size' => getimagesize("{$fulldir}{$entry}")
-          ];
-          break;
-        }
-      }
-    }
-    $d->close();
-    return $retval;
 }
 
 if(isset($_POST['submit'])) {
@@ -151,12 +111,7 @@ if(isset($_POST['submit'])) {
 }
 
 checkMissing();
-
-$imgdir = getcwd() . "/uploads/";
-$images = getImages($imgdir);
-
-$imagetypes = ['image/jpeg', 'image/bmp', 'image/png', 'image/gif', 'image/jpg'];
-
+$imagelist = 'fucker';
 ?>
 
 
@@ -178,7 +133,7 @@ Edit below: CSS Style is below!
 			      img { width: 600px; height: 400px; border: 2px solid #242424; }
 			      td.main a:hover { background: #242424; color: #fff; }
 			      td { background: #242424; color: #fff; }
-			      .photo { float: left; margin: 0.5em; border: 1px solid #ccc; padding: 1em; box-shadow: 2px 2px 3px rgba(0,0,0,0.2); text-align: center; font-size: 0.8em; }
+			      th { font-weight: normal; }
 			      tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line;  }
 			      ainput[type=button], ainput[type=submit], ainput[type=reset] { background-color: #555; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 10%; -webkit-transition-duration: 0.4s; transition-duration: 0.4s; }
 			      input[type=button], input[type=submit], input[type=reset] .abutton:hover { background-color: #555; color: white; box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); }
@@ -221,5 +176,36 @@ Edit below: CSS Style is below!
 			</center>
 			</th>
 		</table>
+		<?php
+			if ($_GET['view']) { showImages(); }
+			function showImages() {
+				$imagelist = '';
+			        $dir = getcwd() . "/uploads";
+				$okfiletypes = array('jpg','jpeg','bmp','png','gif');
+			        $files = array();
+			        if (is_dir($dir)) {
+			                if ($dh = opendir($dir)) {
+                        			while (($file = readdir($dh)) !== false) {
+			                                if (($file != '.') && ($file != '..')) { if (in_array(strtolower(substr($file,(strrpos($file,'.')+1))),$okfiletypes)) { $files[] = $file; } }
+                        			}
+                        			closedir($dh);
+                			}
+        			}
+				sort($files);
+				//foreach ($files as $file) { }
+				echo '
+                        	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+	                                <th>listing current images</th>
+        		                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                        			        <center><th>
+				';
+								foreach ($files as $file) { echo '<a href="/img/'.$file.'">'.$file.'</a><br>'; }
+				echo '
+							</th></center>
+                		                </table>
+                        	</table>
+                        	';
+			}
+		?>
 	</body>
 </html>
