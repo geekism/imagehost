@@ -128,12 +128,8 @@ if(isset($_POST['submit'])) {
 }
 
 checkMissing();
-$imagelist = 'fucker';
+
 ?>
-
-
-
-
 
 <!--
 Edit below: CSS Style is below!
@@ -171,8 +167,6 @@ Edit below: CSS Style is below!
 									?>
 		    </th>
 		</table>
-
-
 		<table border="0" cellpadding="0" cellspacing="0" width="100%">
 			<center>
 			<th>
@@ -221,11 +215,11 @@ Edit below: CSS Style is below!
         		                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
                         			        <center><th>
 				';
-								foreach ($files as $file) {
-									$mod_date=date("F d Y", filemtime($dir.'/'.$file));
-									echo '<b>'.$mod_date,'</b>: <a href="/img/'.$file.'">'.$file.'</a> - size: '.getFilesize($dir.'/'.$file).'<br>'; }
+												foreach ($files as $file) {
+													$mod_date=date("F d Y", filemtime($dir.'/'.$file));
+													echo '<b>'.$mod_date,'</b>: <a href="/img/'.$file.'">'.$file.'</a> - size: '.getFilesize($dir.'/'.$file).'<br>'; }
 				echo '
-							</th></center>
+											</center></th>
                 		                </table>
                         	</table>
                         	';
