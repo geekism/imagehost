@@ -83,8 +83,9 @@ if(isset($_REQUEST["download"])){
     }
 }
 
-$images = $_GET['images'];
-if (strpos($source, 'source') !== false) {
+if(isset($_GET['images'])) { $listimages = true; }
+
+if ($listimages !== false) {
 foreach($images as $img) {
     echo "<div class=\"photo\">";
     echo "<img src=\"{$img['file']}\" {$img['size'][3]} alt=\"\"><br>\n";
