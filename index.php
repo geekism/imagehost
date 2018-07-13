@@ -1,87 +1,11 @@
 <?php
 
-/* 
-	Do not edit anything from here to the STOP. Required for the missing features!
-*/
-
-function getFilesize($file,$digits = 2) {
-       if (is_file($file)) {
-               $filePath = $file;
-               if (!realpath($filePath)) {
-                       $filePath = $_SERVER["DOCUMENT_ROOT"].$filePath;
-       }
-           $fileSize = filesize($filePath);
-               $sizes = array("TB","GB","MB","KB","B");
-               $total = count($sizes);
-               while ($total-- && $fileSize > 1024) {
-                       $fileSize /= 1024;
-                       }
-               return round($fileSize, $digits)." ".$sizes[$total];
-       }
-       return false;
-}
-
-function checkMissing() {
-	if (!file_exists("uploads")) {
-	mkdir("uploads", 0755); chmod("uploads", 0755);
-		echo '
-			<head>
-				<style type="text/css">
-				body { background: #000; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; }
-				</style>
-			<title>Missing: uploads folder</title>
-			</head>
-			<html>
-				<body>
-					<center><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
-						<h2>
-							Directory: <b>uploads</b> wasnt found.
-						</h2><br>
-							Creating it: mkdir uploads/<br>
-							Setting permissions: chmod 755 uploads/<br>
-							Click to <a href="">Continue</a></center>
-				</body>
-			</html>
-			';
-		return 0;
-	}
-	if (!file_exists(".htaccess")) {
-	$file = '.htaccess';
-	$contents = '
-	<IfModule mod_rewrite.c>
-		RewriteEngine on
-		RewriteCond %{HTTPS} !=on
-		RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
-		RewriteRule "^img/(.*)$" "/uploads/$1"
-	</IfModule>
-	Options -Indexes -MultiViews
-	';
-	file_put_contents($file, $contents);
-	    echo '
-			<head>
-				<style type="text/css">
-				body { background: #000; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; }
-				</style>
-			<title>Missing: .htaccess</title>
-			</head>
-			<html>
-				<body>
-					<center><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
-						<h2>
-							File: <b>.htaccess</b> wasnt found.
-						</h2><br>
-							Creating it: touch .htaccess<br>
-							Writing .htaccess settings ... Done<br>
-							Click to <a href="">Continue</a></center>
-				</body>
-			</html>
-			';
-		return 0;
-	}
-}
-
-$imagehost = "v1.5.8";
-
+########################################## START CONFIG #############################################################
+$SHOW_DOT = 0;
+$changelog = 0;
+$ignore_file_list = array("..", ".", "index.php", "view.php", "icons.png", "styles", ".htaccess", "img", "includes", ".git", ".svn");
+$ignore_ext_list = array("exe", "txt", "ini", "conf");
+######################################### END CONFIG ################################################################
 
 if(isset($_REQUEST["download"])){
     $file = urldecode($_REQUEST["download"]);
@@ -99,131 +23,185 @@ if(isset($_REQUEST["download"])){
         exit;
     }
 }
+function is_image($path) {
+	$a = getimagesize($path);
+	$image_type = $a[2];
+	if(in_array($image_type , array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_TIFF_II, IMAGETYPE_TIFF_MM, IMAGETYPE_BMP, IMAGETYPE_ICO, IMAGETYPE_IFF, IMAGETYPE_XBM, IMAGETYPE_WEBP, IMAGETYPE_PSD))) { return true; }
+	return false;
+}
 
-$fi = new FilesystemIterator(__DIR__ . "/uploads/", FilesystemIterator::SKIP_DOTS);
+$source = $_GET['view'];
+$file = $_GET['file'];
 
-if(isset($_GET['view']) == "yes") { $show = "1"; } else { $show = "0"; }
+if (strpos($source, 'source') !== false) { echo nl2br(htmlentities(file_get_contents("index.php"))); die(); }
+if (isset($file)) {
+   echo "<b><p>viewing:&nbsp;&nbsp;&nbsp;&nbsp;".$file."&nbsp;&nbsp;&nbsp;&nbsp; - &nbsp;&nbsp;&nbsp;&nbsp;view raw: &nbsp;&nbsp;&nbsp;&nbsp; <a href=".$_GET['file'].">".$file."</a></p></b>";
+   if (strpos($file, '..') !== false || (strpos($file, '%2E') !== false) || (strpos($file, 'view.php') !== false) || (strpos($file, 'index.php') !== false)) { echo "<h1>Illegal char/filename found in URL</h1>"; exit; }
+echo '
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+   <title>source of: '.$file.' </title>
+   <meta charset="utf-8">
+   <style>
+	   body { align: center; background: #222222; color: #fefefe; font-family: Tahoma, Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
+	   a { color: #ffa200; text-decoration: none; }
+	   a:hover { text-decoration: underline bold; color: #242424; }
+     table { margin: auto; width: 99%; border-collapse: separate; border:solid white 1px; border-radius:9px; -moz-border-radius:9px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
+	   td.main { color: #fff; background: #242424; font-size: 0.900em; padding-top: 3px; padding-bottom: 3px; white-space: pre-line; }
+	   td.main a { color:#ffa200; font-size: 0.900em; }
+	   img { width: 15px; height: 15px; border: 2px solid #242424; }
+	   td.main a:hover { background: #242424; color: #fff; font-weight: bold; }
+	   td { background: #242424; color: #fff; }
+     tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line; }
+	   pre { font-family: monospace; width: 100%; border: 1px dashed #454545; !important; }
+	   p { text-align: center; }
+   </style>
+   <script src="//cdn.rawgit.com/geekism/code-prettify/master/loader/run_prettify.js?skin=sons-of-obsidian"></script>
+</head>
+<body onload="PR.prettyPrint();">
+<table border="0" cellpadding="0" cellspacing="0" width="100%">
+<pre class="prettyprint white-space: pre-line linenums">';
 
+if (is_image($file)) {
+	echo "<img src=\"".$file."\" style=\"height: 80%; width: 80%;\">";
+	echo "</pre>";
+	echo '<center><input action="action" onclick="window.history.go(-1); return false;" type="button" value="Go Back" /><center>
+	<center><h5><a href=/index.php?download='.$file.'>download</a></h5></center>
+	<center><h3><a href="/">Go Home</a></h3></center>';
+	return 1;
+}
+
+if (!is_image(file_exists(getcwd() . '/' . $file))) {
+	if (show_source(getcwd() . '/' . $file));
+	} else {
+		echo "file not found";
+	}
+
+echo '
+</pre>
+<center><input action="action" onclick="window.history.go(-1); return false;" type="button" value="Go Back" /></center>
+<BR>
+<center><h5><a href=/index.php?download='.$file.'>download</a></h5></center>
+<BR>
+<center><h3><a href="/">Go Home</a></h3></center>
+<script src="//code.justla.me/styles/prettify.js"></script>
+<script>prettyPrint();</script>
+</table>
+</body>
+</html>
+';
+exit;
+}
+?>
+<head>
+   <html>
+   <style type="text/css">
+      body { align: center; background: #222222; color: #fefefe; font-family: Tahoma, 'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
+      a { color: #ffa200; text-decoration: none; }
+      a:hover { text-decoration: underline bold; color: #242424; }
+      table { margin: auto; width: 99%; border-collapse:separate; border:solid white 1px; border-radius:9px; -moz-border-radius:9px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
+      td.main { color: #fff; background: #242424; font-size: 0.900em; padding-top: 3px; padding-bottom: 3px; width: 99%; }
+      td.main a { color:#ffa200; font-size: 0.900em; width: 99%; }
+      img { width: 15px; height: 15px; border: 2px solid #242424; }
+      td.main a:hover { background: #242424; color: #fff; font-weight: bold; }
+      td { background: #242424; color: #fff; }
+      tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line;  }
+   </style>
+   <script src="//cdn.rawgit.com/geekism/code-prettify/master/loader/run_prettify.js?skin=sons-of-obsidian"></script>
+   <title>
+      Quick Directory Listing
+   </title>
+</head>
+<body>
+<?php
 function getFileExt($filename) {
    return substr(strrchr($filename,'.'),1);
 }
 
-function is_image($path) {
-    $a = getimagesize($path);
-    $image_type = $a[2];
-    if(in_array($image_type , array(IMAGETYPE_GIF, IMAGETYPE_JPEG, IMAGETYPE_PNG, IMAGETYPE_BMP))) { return true; }
-    return false;
+$THIS_SCRIPT = getenv("SCRIPT_NAME");
+$dir=$_GET['d'];
+if ($dir=="" || $dir==false) { $dir="."; }
+$absdir = realpath($dir);
+if ($absdir != "") { $absdir .= "/"; }
+
+$scriptdir = getcwd();
+if ($scriptdir != "") { $scriptdir .= "/"; }
+$pos = strpos($absdir,$scriptdir);
+
+if ($pos !== 0) {
+   die("<b>ERROR</b>: An invalid directory (<b>$dir</b>) was entered.");
 }
 
-if(isset($_POST['submit'])) {
-    $temp_name = $_FILES["file"]["tmp_name"];
-    $name = $_FILES["file"]["name"];
-    if (is_image($temp_name)) {
-        $newname = substr(str_shuffle(str_repeat("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0987654321", 10)), 0, 10);
-        $ext = pathinfo($name, PATHINFO_EXTENSION);
-        move_uploaded_file($temp_name, "uploads/$newname.$ext");
-        chmod("uploads/$newname.$ext", 0644);
-        $message = "". $newname . "." . $ext . " was uploaded!<br><br>";
-    }
+$reldir = substr($absdir,strlen($scriptdir));
+clearstatcache();
+$handle  = opendir($absdir);
+while (false !== ($filename = readdir($handle))) {
+   if (is_dir($absdir."/".$filename)==true && $filename!=".") { $dirs[] = $filename; }
+   if (is_dir($absdir."/".$filename)==false && $filename!=$THIS_SCRIPT) { if ($SHOW_DOT || substr($filename,0,1)!=".") { $files[] = $filename; } }
 }
 
-checkMissing();
+$at_topdir = $absdir==$scriptdir;
+if (! $at_topdir) {
+   $absparentdir="";
+   $subdirs=explode("/",$absdir);
+   for($x=1;$x<=count($subdirs)-3;$x++) { $absparentdir.="/".$subdirs[$x]; }
+}
 
+$relparentdir = substr($absparentdir,strlen($scriptdir));
+if ($files) { sort($files); }
+if ($dirs)  { sort($dirs); }
+if ($reldir=="") { $showdir = "."; } else { $showdir = $reldir; }
+echo "<br>Current Directory&nbsp;&nbsp;&nbsp;&nbsp;:   <b>$showdir</b><br/><br/>\n";
+echo "<table><tr><td>";
+
+if ($at_topdir) {
+   echo "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;";
+} else {
+   echo "<img width='16' height='16' alt='star' src='data:image/gif;base64,R0lGODlhGwAWAMIAAP/////Mmcz//7u7u5lmMzMzMwAAAAAAACH+TlRoaXMgYXJ0IGlzIGluIHRoZSBwdWJsaWMgZG9tYWluLiBLZXZpbiBIdWdoZXMsIGtldmluaEBlaXQuY29tLCBTZXB0ZW1iZXIgMTk5NQAh+QQBAAACACwAAAAAGwAWAAADZSi63P4wykmrbSbrfJcZYAga3SeeGxeZZxuSEOu6sCOjc8rdb8AbgaCQkKEJdcJhoYhKOp+EpeAGfFoDUZisenVmPb2uVwoecMXBL+NzRqvXbfEbQ6jb7/cCOabv+/0qEjqDNQ8JADs='><a href=\"$THIS_SCRIPT?d=$relparentdir\">Up Level</a>";
+}
+
+echo "</td>\n";
+echo "<td>\nFolders:\n<br><br>";
+if ($dirs) {
+   foreach($dirs as $name) {
+      if(!in_array($name, $ignore_file_list)) {
+         echo "<img width='16' height='16' alt='star' src='data:image/gif;base64,R0lGODlhFAAWAMIAAP/////Mmcz//5lmMzMzMwAAAAAAAAAAACH+TlRoaXMgYXJ0IGlzIGluIHRoZSBwdWJsaWMgZG9tYWluLiBLZXZpbiBIdWdoZXMsIGtldmluaEBlaXQuY29tLCBTZXB0ZW1iZXIgMTk5NQAh+QQBAAACACwAAAAAFAAWAAADVCi63P4wyklZufjOErrvRcR9ZKYpxUB6aokGQyzHKxyO9RoTV54PPJyPBewNSUXhcWc8soJOIjTaSVJhVphWxd3CeILUbDwmgMPmtHrNIyxM8Iw7AQA7''><a href=\"$THIS_SCRIPT?d=$reldir$name\">$name</a><br/>";
+      }
+   }
+} else {
+  echo "\n";
+}
+
+echo "<br><br></td>\n";
+echo "<td>\nFiles:\n<br><br>";
+if ($files) {
+   foreach($files as $name) {
+      $fileExt = getFileExt($name);
+      if(!in_array($name, $ignore_ext_list)) {
+         echo "<a href=\"$THIS_SCRIPT?download=$reldir$name\"><img width='16' height='16' alt='star' src='data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAACHUlEQVR42n2Tu4sTURTG584rmdm8iEYRrERQUWELa9m/II0gW0S2FSxsBEGxUQsFLSy2lQjLEsRexG20URAtV7EREatIkASZR2bu+DvjzTLGx4WPk73n+77z2DvK+vMcBgNwFhwAORiDl+Ah+FYlqyXxBrihlHKImRHLkb/doihS4nXw5DcDIxgSpeoP4pyolwopDHxiSHwKLu4Z2LZ9E9EAiFgqWxDuZlk2kt+u665zf9Xce2AFbGqt7ynER8GziphcUZvP56eqs3me95q8ZzoREx+DNYX7NcdxLmASiVjIJMIkSU5UDXzffwPPXowknDzPNxWJHUwOmrnLQyKM4/h41aBer781BoUZxWfEjyoIgvcYJBhoLssKJLIois5UDeC9gheKdsGFFqtGo7FLIuVC2roym82eW/85zWZzjXEfYFKwp1QMdhhjHwYuF99xXaf9r38TM8Yhim2D/ZjoNE0/qVardYsN93GU1gOWN2UH50h+XlriEXbwuFartTCIpGM4W4qWTnI5IpkzgoNJHZMIk/PEDyImv0r+ETFEHFM9h2eT75cPqdvt3qZCX9oSE0YRkwSSfBMriIa0by3EcGyqb08mkzulQbvd9jAYMspp2bAQMAlA+VDJ5UasTZcv8L88nU7zvY+p0+k4EDcgXoIoL03Y5b+V9vWv96UTTO+Px+PRv75Gq9frybIGYJVujplHs8tO3oEtxF+q/J8UyDX70PhePwAAAABJRU5ErkJggg=='></img></a> <img width='16' height='16' alt='star' src='data:image/gif;base64,R0lGODlhFAAVAMIAAAAAAMDAwP8A/4CAgAAAgP///0KapwAAACH5BAEAAAIALAAAAAAUABUAAANJKELcPipKUqq1gch5e8ibQnVYAW4jaVZnlJIBBrlqZTgAVxdDP+S0nemjCQpNRdHRklwsK82XMPosUJ/XZfa4neq0X+7EQS4rEgA7'></img><a href=?file=$reldir$name>$name</a><br/>";
+      }
+   }
+} else {
+   echo "\n<br><br><br>";
+}
+echo "<br><br></td></tr></table>\n";
+if ($changelog) { 
+echo '
+<BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR><BR>
+<table>
+      <tr><th><td align="center"><br>Change Log:</td></th></tr>
+      <tr><td><b>1.0.1</b></td><td align="right">Added StyleSheet Internally.</td></tr>
+      <tr><td><b>1.0.2</b></td><td align="right">Added File Name Ignoring.</td></tr>
+      <tr><td><b>1.0.3</b></td><td align="right">Added File Extention Ignoring.</td></tr>
+      <tr><td><b>1.0.4</b></td><td align="right">Got rid of view.php and created view.php within \'index.php\' to do a single file operation.</td></tr>
+      <tr><td><b>1.0.5</b></td><td align="right">Created DataURI of folder.open.gif, folder.gif, file.gif.</td></tr>
+      <tr><td><b>1.0.6</b></td><td align="right">Added Change log to index.php</td></tr>
+      <tr><td><b>9.9.9</b><BR><BR><BR></td><td align="right">End of change log.<BR><BR><BR></td></tr>
+</table>
+';
+
+}
 ?>
-
-<!--
-Edit below: CSS Style is below!
--->
-
-	<head>
-			<style type="text/css">
-			      body { background: #222222; color: #fefefe; font-family: Tahoma, 'Lucida Grande', 'Trebuchet MS', Arial, Helvetica, Sans-Serif; font-size: 0.900em; font-color: #242424; }
-			      a { color: #ffa200; text-decoration: none; }
-			      a:hover { text-decoration: underline bold; color: #242424; }
-			      table { margin: auto; width: 75%; border-collapse:separate; border:solid white 1px; border-radius:4px; -moz-border-radius:4px; padding-left: 10px; padding-right: 10px; background: #242424; border: 1px solid #fff; white-space: pre-line; }
-			      td.main { color: #fff; background: #242424; font-size: 0.900em; padding-top: 3px; padding-bottom: 3px; width: 99%; }
-			      td.main a { color:#ffa200; font-size: 0.900em; width: 99%; }
-			      img { width: 600px; height: 400px; border: 2px solid #242424; }
-			      td.main a:hover { background: #242424; color: #fff; }
-			      td { background: #242424; color: #fff; }
-			      th { font-weight: normal; }
-			      tr.main td { padding-top: 2px; padding-bottom: 2px; vertical-align: top; padding-left: 10px; padding-right: 10px; white-space: pre-line;  }
-			      ainput[type=button], ainput[type=submit], ainput[type=reset] { background-color: #555; border: none; color: white; padding: 2px 8px; text-align: center; text-decoration: none; display: inline-block; font-size: 16px; border-radius: 10%; -webkit-transition-duration: 0.4s; transition-duration: 0.4s; }
-			      input[type=button], input[type=submit], input[type=reset] .abutton:hover { background-color: #555; color: white; box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19); }
-			      footer { color: #fff; font-size: 10px; }
-			</style>
-		<title>Image Hosting: Powered by justla.me</title>
-	</head>
-<html>
-	<body>
-		<table border="0" cellpadding="0" cellspacing="0" width="100%">
-			<th>
-			<a href="/">home</a> - <?php
-									if ($show) {
-										echo '<a href="/">hide images</a>';
-									}else{
-										echo '<a href="?view=yes">show images</a>';
-									}
-									?>
-		    </th>
-		</table>
-		<table border="0" cellpadding="0" cellspacing="0" width="100%">
-			<center>
-			<th>
-				<br><br>
-				<h2>Free Image Hosting!</h2>
-				<?php printf("There is %d images being hosted on this server", iterator_count($fi)); ?>
-				<br><br>
-				<form action="" method="post" enctype="multipart/form-data" id="hostimg">
-				<input type="file" name="file" id="file" multiple="multiple" accept="image/*"/>
-				<br><label for="female">Accepted Formats: jpg, jpeg. bmp, png, gif</label><br>
-				<br><br>
-				<input type="submit" name="submit" value="submit"/>
-				</form> 
-				<BR><BR>	
-				<?php
-					if ($message) {
-							echo $message;
-							echo "<img src=\"img/".$newname.".".$ext."\" alt=\"".$newname.".".$ext."\"><br><br>";
-							echo "<a href=img/".$newname.".".$ext.">http://".$_SERVER['HTTP_HOST']."/img/".$newname.".".$ext."</a>";
-					}
-				?>
-				<BR><BR>
-                                <footer>ImageHosting<?php echo $imagehost; ?>.php: Powered by <a href="https://github.com/geekism/imagehost" target="_blank">justla.me</a><br><br></footer>
-			</center>
-			</th>
-		</table>
-		<?php
-			if ($_GET['view']) { showImages(); }
-			function showImages() {
-				$imagelist = '';
-			        $dir = getcwd() . "/uploads";
-				$okfiletypes = array('jpg','jpeg','bmp','png','gif');
-			        $files = array();
-			        if (is_dir($dir)) {
-			                if ($dh = opendir($dir)) {
-                        			while (($file = readdir($dh)) !== false) {
-			                                if (($file != '.') && ($file != '..')) { if (in_array(strtolower(substr($file,(strrpos($file,'.')+1))),$okfiletypes)) { $files[] = $file; } }
-                        			}
-                        			closedir($dh);
-                			}
-        			}
-				sort($files);
-				echo '
-                        	<table border="0" cellpadding="0" cellspacing="0" width="100%">
-	                                <th>listing current images</th>
-        		                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                        			        <center><th>
-				';
-												foreach ($files as $file) {
-													$mod_date=date("F d Y", filemtime($dir.'/'.$file));
-													echo '<b>'.$mod_date,'</b>: <a href="/img/'.$file.'">'.$file.'</a> - size: '.getFilesize($dir.'/'.$file).'<br>'; }
-				echo '
-											</center></th>
-                		                </table>
-                        	</table>
-                        	';
-			}
-		?>
-	</body>
+</body>
 </html>
