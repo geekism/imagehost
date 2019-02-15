@@ -69,8 +69,8 @@ function is_image($path) {
 function checkMissing() {
 	global $uploaddir;
 	if (!file_exists($uploaddir)) {
-		mkdir("$uploaddir", 0744);
-		chmod("$uploaddir", 0744);
+		mkdir("$uploaddir", 0755);
+		chmod("$uploaddir", 0755);
 		$output .= '
 		<head>
 		<style type="text/css">
