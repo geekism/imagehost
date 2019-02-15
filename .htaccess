@@ -1,0 +1,8 @@
+<IfModule mod_rewrite.c>
+	RewriteEngine on
+	RewriteCond %{HTTPS} !=on
+	RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+	RewriteRule "^takeapeek/(.*)$" "/fGsniaindFC9eRNo//$1"
+	RewriteRule "^i/(.*)$" "/fGsniaindFC9eRNo//$1"
+</IfModule>
+Options -Indexes -MultiViews
